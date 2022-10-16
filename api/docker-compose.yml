@@ -1,0 +1,9 @@
+services:
+  app:
+    build: .
+    container_name: table-query-api
+    command: python runserver.py
+    ports:
+      - 8080:80
+    volumes:
+      - .:/app
