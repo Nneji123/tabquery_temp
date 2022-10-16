@@ -1,18 +1,15 @@
-from fastapi import FastAPI, status, HTTPException, Depends
-from fastapi.security import OAuth2PasswordRequestForm
-from fastapi.responses import RedirectResponse
-from app.schemas import UserOut, UserAuth, TokenSchema, SystemUser
-from replit import db
-from app.utils import (
-    get_hashed_password,
-    create_access_token,
-    create_refresh_token,
-    verify_password
-)
-from uuid import uuid4
-from app.deps import get_current_user
-from utils import execute_query
 import os
+from uuid import uuid4
+
+from app.deps import get_current_user
+from app.schemas import SystemUser, TokenSchema, UserAuth, UserOut
+from app.utils import (create_access_token, create_refresh_token,
+                       get_hashed_password, verify_password)
+from fastapi import Depends, FastAPI, HTTPException, status, File, UploadFile
+from fastapi.responses import RedirectResponse
+from fastapi.security import OAuth2PasswordRequestForm
+from replit import db
+from .utils import execute_query
 
 app = FastAPI()
 
@@ -65,7 +62,7 @@ async def get_me(user: SystemUser = Depends(get_current_user)):
     return user
 
 @app.post("/query", tags=["table-query"], summary="Post query and get answer", response_model=UserOut)
-async def get_table(user: SystemUser = Depends(get_current_user), question:str, file: UploadFile = File(...)):
+async def get_table(question:str, user: SystemUser = Depends(get_current_user), file: UploadFile = File(...)):
     files = await file.read()
     # save the file
     filename = "filename.csv"

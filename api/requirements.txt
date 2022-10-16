@@ -1,5 +1,9 @@
 fastapi[all]
-pandas==1.4.3
+python-jose==1.0.0
+pandas==1.5.0
+passlib==1.7.4
+replit==3.2.4
 tensorflow-cpu==2.9.1
 tensorflow_probability==0.17.0
-transformers==4.21.2
+transformers==4.23.1
+
