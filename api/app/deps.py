@@ -6,7 +6,8 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt
 from pydantic import ValidationError
-from replit import db
+from replit import 
+
 
 from .utils import ALGORITHM, JWT_SECRET_KEY
 
