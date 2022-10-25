@@ -1,0 +1,4 @@
+fastapi[all]
+pandas==1.5.1
+transformers==4.23.1
+pyarrow==9.0.0
