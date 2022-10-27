@@ -2,7 +2,7 @@ import os
 
 import pandas as pd
 from transformers import TapasTokenizer, TFTapasForQuestionAnswering
-
+import datetime
 
 def execute_query_csv(query: str, csv_file):
     a = datetime.datetime.now()
