@@ -19,14 +19,14 @@ async def get_table_csv(query: Question, file: UploadFile = File(...)):
     else:
         files = await file.read()
         # save the file
-        filename = "filename.csv"
+        filename = "data/filename.csv"
         with open(filename, "wb+") as f:
             f.write(files)
         # open the file and return the file name
         try:
             data = execute_query_csv(str(query.quest), "filename.csv")
-            if os.path.exists("filename.csv"):
-                os.remove("filename.csv")
+            if os.path.exists("data/filename.csv"):
+                os.remove("data/filename.csv")
             return data
         except ValueError as e:
             return {"error": str(e)}
@@ -40,14 +40,14 @@ async def get_table_csv(question:str, file: UploadFile = File(...)):
     else:
         files = await file.read()
         # save the file
-        filename = "filename.xlsx"
+        filename = "data/filename.xlsx"
         with open(filename, "wb+") as f:
             f.write(files)
         # open the file and return the file name
         try:
-            data = execute_query_excel(question, "filename.xlsx")
-            if os.path.exists("filename.xlsx"):
-                os.remove("filename.xlsx")
+            data = execute_query_excel(question, "data/filename.xlsx")
+            if os.path.exists("data/filename.xlsx"):
+                os.remove("data/filename.xlsx")
             return data
         except ValueError as e:
             return {"error": str(e)}

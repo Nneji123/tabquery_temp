@@ -161,7 +161,7 @@ def convert_pdf_to_csv(question:str, files: str = "filename.pdf"):
     files = "filename.pdf"
     tables = camelot.read_pdf(files)
     dataframe = tables[0].df
-    dataframe.to_csv("file.csv")
+    dataframe.to_csv("file.csv", index = False, header=False)
     answer = execute_query_csv(question, "file.csv")
     return answer
 
