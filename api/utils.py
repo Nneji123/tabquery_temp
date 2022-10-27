@@ -5,16 +5,23 @@ import camelot
 from transformers import TapasTokenizer, TFTapasForQuestionAnswering
 import datetime
 
+import warnings
+warnings.filterwarnings("ignore")
+
 def tensorflow_shutup():
     """
     Make Tensorflow less verbose
     """
     try:
         os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+        import logging
+        logging.getLogger("tensorflow").setLevel(logging.WARNING)
 
         # noinspection PyPackageRequirements
         import tensorflow as tf
         from tensorflow.python.util import deprecation
+        # Place this before directly or indirectly importing tensorflow
+
 
         tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 
@@ -29,6 +36,8 @@ def tensorflow_shutup():
 
     except ImportError:
         pass
+    
+
 
 def execute_query_csv(query: str, csv_file):
     a = datetime.datetime.now()
@@ -190,4 +199,5 @@ def convert_pdf_to_csv(question:str, files: str = "filename.pdf"):
     answer = execute_query_csv(question, "file.csv")
     return answer
 
+tensorflow_shutup()
 print(convert_pdf_to_csv("what is the improved speed of distance=1.3?", "fo.pdf"))
