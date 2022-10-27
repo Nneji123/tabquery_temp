@@ -24,7 +24,7 @@ async def get_table_csv(question: str, file: UploadFile = File(...)):
             f.write(files)
         # open the file and return the file name
         try:
-            data = execute_query_csv(question, "filename.csv")
+            data = execute_query_csv(question, "data/filename.csv")
             if os.path.exists("data/filename.csv"):
                 os.remove("data/filename.csv")
             return data
