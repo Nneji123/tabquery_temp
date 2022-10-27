@@ -1,5 +1,9 @@
 fastapi[all]
-pandas==1.4.3
-tensorflow-cpu==2.9.1
+pandas==1.5.1
+transformers==4.23.1
 tensorflow_probability==0.17.0
-transformers==4.21.2
+tensorflow-cpu==2.9.1
+pyarrow==9.0.0
+openpyxl==3.0.10
+camelot==13.04.13-gpl-pyqt
+camelot_py==0.10.1

@@ -2,14 +2,19 @@ FROM python:3.8.13-slim-bullseye
 
 WORKDIR /app
 
+RUN apt-get -y update  && apt-get install -y \
+  wget \
+  ghostscript \
+  python3-tk
+
 RUN pip install --upgrade setuptools 
 
-ADD . .
+COPY . .
 
 RUN pip install -r requirements.txt
 
 EXPOSE 8000:8000
 
-RUN python download.py
+RUN python load_model.py
 
-CMD python runserver.py
+CMD uvicorn app:app --host 0.0.0.0 --port 8000

@@ -1,6 +1,7 @@
 import os
 
 import pandas as pd
+import camelot
 from transformers import TapasTokenizer, TFTapasForQuestionAnswering
 import datetime
 
@@ -153,3 +154,15 @@ def execute_query_parquet(query: str, parquet_file):
     print(b - a)
 
     return query_result
+
+
+
+def convert_pdf_to_csv(question:str, files: str = "filename.pdf"):
+    files = "filename.pdf"
+    tables = camelot.read_pdf(files)
+    dataframe = tables[0].df
+    dataframe.to_csv("file.csv")
+    answer = execute_query_csv(question, "file.csv")
+    return answer
+
+print(convert_pdf_to_csv("what is the improved speed of distance=1.3?", "fo.pdf"))
