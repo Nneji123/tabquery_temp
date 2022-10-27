@@ -28,4 +28,4 @@ jobs:
         uses: dariocurr/pytest-summary@main 
         with:
           output: test-summary.md
-          paths: tests/**.py
+          paths: api/tests/**.py
