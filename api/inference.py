@@ -9,7 +9,7 @@ from transformers import TapasTokenizer, TFTapasForQuestionAnswering
 warnings.filterwarnings("ignore")
 
 
-#### MODELS
+# MODELS
 MICROSOFT_LARGE_MODEL = "microsoft/tapex-large"
 MICROSOFT_BASE_MODEL = "microsoft/tapex-base"
 
