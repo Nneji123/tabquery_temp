@@ -33,3 +33,10 @@ jobs:
         with:
           output: test-summary.md
           paths: tests/**.py
+
+      - name: Upload test summary
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-summary
+          path: test-summary.md
+        if: always()
