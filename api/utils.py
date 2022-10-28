@@ -1,203 +1,100 @@
 import os
-
-import pandas as pd
-import camelot
-from transformers import TapasTokenizer, TFTapasForQuestionAnswering
-import datetime
-
-import warnings
-warnings.filterwarnings("ignore")
-
-def tensorflow_shutup():
-    """
-    Make Tensorflow less verbose
-    """
-    try:
-        os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
-        import logging
-        logging.getLogger("tensorflow").setLevel(logging.WARNING)
-
-        # noinspection PyPackageRequirements
-        import tensorflow as tf
-        from tensorflow.python.util import deprecation
-        # Place this before directly or indirectly importing tensorflow
+import jwt
+from configparser import ConfigParser
 
 
-        tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
+def set_up():
+    """Sets up configuration for the app"""
 
-        # Monkey patching deprecation utils to shut it up! Maybe good idea to disable this once after upgrade
-        # noinspection PyUnusedLocal
-        def deprecated(date, instructions, warn_once=True):  # pylint: disable=unused-argument
-            def deprecated_wrapper(func):
-                return func
-            return deprecated_wrapper
+    env = os.getenv("ENV", ".config")
 
-        deprecation.deprecated = deprecated
-
-    except ImportError:
-        pass
-    
-
-
-def execute_query_csv(query: str, csv_file):
-    a = datetime.datetime.now()
-
-    table = pd.read_csv(csv_file, delimiter=",", nrows=64, skip_blank_lines=True)
-    table.fillna(0, inplace=True)
-    table = table.astype(str)
-
-    model_name = "google/tapas-base-finetuned-wtq"
-    model = TFTapasForQuestionAnswering.from_pretrained(model_name)
-    tokenizer = TapasTokenizer.from_pretrained(model_name)
-
-    queries = [query]
-
-    inputs = tokenizer(table=table, queries=queries, padding="max_length", return_tensors="tf")
-    outputs = model(**inputs)
-
-    predicted_answer_coordinates, predicted_aggregation_indices = tokenizer.convert_logits_to_predictions(
-        inputs, outputs.logits, outputs.logits_aggregation
-    )
-
-    # let's print out the results:
-    id2aggregation = {0: "NONE", 1: "SUM", 2: "AVERAGE", 3: "COUNT"}
-    aggregation_predictions_string = [id2aggregation[x] for x in predicted_aggregation_indices]
-
-    answers = []
-    for coordinates in predicted_answer_coordinates:
-        if len(coordinates) == 1:
-            # only a single cell:
-            answers.append(table.iat[coordinates[0]])
-        else:
-            # multiple cells
-            cell_values = []
-            for coordinate in coordinates:
-                cell_values.append(table.iat[coordinate])
-            answers.append(cell_values)
-
-    for query, answer, predicted_agg in zip(queries, answers, aggregation_predictions_string):
-        if predicted_agg != "NONE":
-            answers.append(predicted_agg)
-
-    query_result = {
-        "query": query,
-        "result": answers
-    }
-
-    b = datetime.datetime.now()
-    print(b - a)
-
-    return query_result
-
-def execute_query_excel(query: str, excel_file):
-    a = datetime.datetime.now()
-
-    table = pd.read_excel(excel_file, nrows=64)
-    table.fillna(0, inplace=True)
-    table = table.astype(str)
-
-    model_name = "google/tapas-base-finetuned-wtq"
-    model = TFTapasForQuestionAnswering.from_pretrained(model_name)
-    tokenizer = TapasTokenizer.from_pretrained(model_name)
-
-    queries = [query]
-
-    inputs = tokenizer(table=table, queries=queries, padding="max_length", return_tensors="tf")
-    outputs = model(**inputs)
-
-    predicted_answer_coordinates, predicted_aggregation_indices = tokenizer.convert_logits_to_predictions(
-        inputs, outputs.logits, outputs.logits_aggregation
-    )
-
-    # let's print out the results:
-    id2aggregation = {0: "NONE", 1: "SUM", 2: "AVERAGE", 3: "COUNT"}
-    aggregation_predictions_string = [id2aggregation[x] for x in predicted_aggregation_indices]
-
-    answers = []
-    for coordinates in predicted_answer_coordinates:
-        if len(coordinates) == 1:
-            # only a single cell:
-            answers.append(table.iat[coordinates[0]])
-        else:
-            # multiple cells
-            cell_values = []
-            for coordinate in coordinates:
-                cell_values.append(table.iat[coordinate])
-            answers.append(cell_values)
-
-    for query, answer, predicted_agg in zip(queries, answers, aggregation_predictions_string):
-        if predicted_agg != "NONE":
-            answers.append(predicted_agg)
-
-    query_result = {
-        "query": query,
-        "result": answers
-    }
-
-    b = datetime.datetime.now()
-    print(b - a)
-
-    return query_result
-
-def execute_query_parquet(query: str, parquet_file):
-    a = datetime.datetime.now()
-
-    table = pd.read_parquet(parquet_file, delimiter=",", nrows=64, skip_blank_lines=True)
-    table.fillna(0, inplace=True)
-    table = table.astype(str)
-
-    model_name = "google/tapas-base-finetuned-wtq"
-    model = TFTapasForQuestionAnswering.from_pretrained(model_name)
-    tokenizer = TapasTokenizer.from_pretrained(model_name)
-
-    queries = [query]
-
-    inputs = tokenizer(table=table, queries=queries, padding="max_length", return_tensors="tf")
-    outputs = model(**inputs)
-
-    predicted_answer_coordinates, predicted_aggregation_indices = tokenizer.convert_logits_to_predictions(
-        inputs, outputs.logits, outputs.logits_aggregation
-    )
-
-    # let's print out the results:
-    id2aggregation = {0: "NONE", 1: "SUM", 2: "AVERAGE", 3: "COUNT"}
-    aggregation_predictions_string = [id2aggregation[x] for x in predicted_aggregation_indices]
-
-    answers = []
-    for coordinates in predicted_answer_coordinates:
-        if len(coordinates) == 1:
-            # only a single cell:
-            answers.append(table.iat[coordinates[0]])
-        else:
-            # multiple cells
-            cell_values = []
-            for coordinate in coordinates:
-                cell_values.append(table.iat[coordinate])
-            answers.append(cell_values)
-
-    for query, answer, predicted_agg in zip(queries, answers, aggregation_predictions_string):
-        if predicted_agg != "NONE":
-            answers.append(predicted_agg)
-
-    query_result = {
-        "query": query,
-        "result": answers
-    }
-
-    b = datetime.datetime.now()
-    print(b - a)
-
-    return query_result
+    if env == ".config":
+        config = ConfigParser()
+        config.read(".config")
+        config = config["AUTH0"]
+    else:
+        config = {
+            "DOMAIN": os.getenv("DOMAIN", "your.domain.com"),
+            "API_AUDIENCE": os.getenv("API_AUDIENCE", "your.audience.com"),
+            "ISSUER": os.getenv("ISSUER", "https://your.domain.com/"),
+            "ALGORITHMS": os.getenv("ALGORITHMS", "RS256"),
+        }
+    return config
 
 
+class VerifyToken():
+    """Does all the token verification using PyJWT"""
 
-def convert_pdf_to_csv(question:str, files: str = "filename.pdf"):
-    files = "filename.pdf"
-    tables = camelot.read_pdf(files)
-    dataframe = tables[0].df
-    dataframe.to_csv("file.csv", index = False, header=False)
-    answer = execute_query_csv(question, "file.csv")
-    return answer
+    def __init__(self, token, permissions=None, scopes=None):
+        self.token = token
+        self.permissions = permissions
+        self.scopes = scopes
+        self.config = set_up()
 
-tensorflow_shutup()
-print(convert_pdf_to_csv("what is the improved speed of distance=1.3?", "fo.pdf"))
+        # This gets the JWKS from a given URL and does processing so you can use any of
+        # the keys available
+        jwks_url = f'https://{self.config["DOMAIN"]}/.well-known/jwks.json'
+        self.jwks_client = jwt.PyJWKClient(jwks_url)
+
+    def verify(self):
+        # This gets the 'kid' from the passed token
+        try:
+            self.signing_key = self.jwks_client.get_signing_key_from_jwt(
+                self.token
+            ).key
+        except jwt.exceptions.PyJWKClientError as error:
+            return {"status": "error", "msg": error.__str__()}
+        except jwt.exceptions.DecodeError as error:
+            return {"status": "error", "msg": error.__str__()}
+
+        try: 
+            payload = jwt.decode(
+                self.token,
+                self.signing_key,
+                algorithms=self.config["ALGORITHMS"],
+                audience=self.config["API_AUDIENCE"],
+                issuer=self.config["ISSUER"],
+            )
+        except Exception as e:
+            return {"status": "error", "message": str(e)}
+
+        if self.scopes:
+            result = self._check_claims(payload, 'scope', str, self.scopes.split(' '))
+            if result.get("error"):
+                return result
+
+        if self.permissions:
+            result = self._check_claims(payload, 'permissions', list, self.permissions)
+            if result.get("error"):
+                return result
+
+        return payload
+
+    def _check_claims(self, payload, claim_name, claim_type, expected_value):
+
+        instance_check = isinstance(payload[claim_name], claim_type)
+        result = {"status": "success", "status_code": 200}
+
+        payload_claim = payload[claim_name]
+
+        if claim_name not in payload or not instance_check:
+            result["status"] = "error"
+            result["status_code"] = 400
+
+            result["code"] = f"missing_{claim_name}"
+            result["msg"] = f"No claim '{claim_name}' found in token."
+            return result
+
+        if claim_name == 'scope':
+            payload_claim = payload[claim_name].split(' ')
+
+        for value in expected_value:
+            if value not in payload_claim:
+                result["status"] = "error"
+                result["status_code"] = 403
+
+                result["code"] = f"insufficient_{claim_name}"
+                result["msg"] = (f"Insufficient {claim_name} ({value}). You don't have "
+                                  "access to this resource")
+                return result
+        return result

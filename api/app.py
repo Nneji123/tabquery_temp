@@ -1,7 +1,7 @@
 import os
 
 from fastapi import Depends, FastAPI, HTTPException, status, File, UploadFile
-from utils import execute_query_csv, execute_query_excel, execute_query_parquet
+from inference import execute_query_csv, execute_query_excel, execute_query_parquet
 from fastapi.security import HTTPBearer
 # from schemas import Question
 
@@ -14,7 +14,7 @@ async def docs():
 
 
 @app.post("/api/private/query-csv", tags=["table-query-csv"], summary="Post query and get answer")
-async def get_table_csv(token: str = Depends(token_auth_scheme),question: str, file: UploadFile = File(...)):
+async def get_table_csv(question: str,token: str = Depends(token_auth_scheme), file: UploadFile = File(...)):
     """
     The get_table_csv function is used to get a table from a csv file.
     It takes in the question and the file as parameters. It then reads the file, saves it, and executes
