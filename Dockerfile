@@ -9,12 +9,12 @@ RUN apt-get -y update  && apt-get install -y \
 
 RUN pip install --upgrade setuptools 
 
-ADD requirements.txt .
+ADD api/requirements.txt .
 
 RUN pip install -r requirements.txt
 
 ADD . .
 
-RUN python load_model.py
+RUN python api/load_model.py
 
-CMD uvicorn app:app --host 0.0.0.0 --port 8000
+CMD uvicorn api.app:app --host 0.0.0.0 --port 8000
