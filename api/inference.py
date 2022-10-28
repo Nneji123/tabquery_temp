@@ -9,6 +9,23 @@ from transformers import TapasTokenizer, TFTapasForQuestionAnswering
 warnings.filterwarnings("ignore")
 
 
+#### MODELS
+MICROSOFT_LARGE_MODEL = "microsoft/tapex-large"
+MICROSOFT_BASE_MODEL = "microsoft/tapex-base"
+
+
+OMNITAB_FINETUNED_MODEL = "neulab/omnitab-large-finetuned-wtq"
+
+GOOGLE_LARGE_MODEL = "google/tapas-large-finetuned-wtq"
+GOOGLE_BASE_MODEL = "google/tapas-base-finetuned-wtq"
+GOOGLE_MEDIUM_MODEL = "google/tapas-medium-finetuned-wtq"
+GOOGLE_SMALL_MODEL = "google/tapas-small-finetuned-wtq"
+
+
+
+
+model_names = [""]
+
 def tensorflow_shutup(normal: bool = True):
     
     """
@@ -51,7 +68,7 @@ def execute_query_csv(query: str, csv_file):
     table.fillna(0, inplace=True)
     table = table.astype(str)
 
-    model_name = "google/tapas-base-finetuned-wtq"
+    model_name = GOOGLE_BASE_MODEL
     model = TFTapasForQuestionAnswering.from_pretrained(model_name)
     tokenizer = TapasTokenizer.from_pretrained(model_name)
 
@@ -167,7 +184,7 @@ def execute_query_parquet(query: str, parquet_file):
     table.fillna(0, inplace=True)
     table = table.astype(str)
 
-    model_name = "google/tapas-base-finetuned-wtq"
+    # model_name = "google/tapas-base-finetuned-wtq"
     model = TFTapasForQuestionAnswering.from_pretrained(model_name)
     tokenizer = TapasTokenizer.from_pretrained(model_name)
 
