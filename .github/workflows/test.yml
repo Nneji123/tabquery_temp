@@ -21,6 +21,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y ghostscript python3-tk
           pip install -r api/requirements.txt 
+          cp -r tests/salaries.csv .
           python api/load_model.py
         shell: bash
       - name: Install dependencies
