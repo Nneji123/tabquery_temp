@@ -9,12 +9,13 @@ from transformers import TapasTokenizer, TFTapasForQuestionAnswering
 warnings.filterwarnings("ignore")
 
 
-def tensorflow_shutup():
+def tensorflow_shutup(normal: bool = True):
+    
     """
     Make Tensorflow less verbose
     """
     try:
-        os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
+        os.environ["TF_CPP_MIN_LOG_LEVEL"] = "1"
         import logging
 
         logging.getLogger("tensorflow").setLevel(logging.WARNING)
@@ -225,5 +226,5 @@ def execute_query_parquet(query: str, parquet_file):
 #     return answer
 
 
-# tensorflow_shutup()
+tensorflow_shutup()
 # print(convert_pdf_to_csv("what is the improved speed of distance=1.3?", "fo.pdf"))
