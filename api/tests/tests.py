@@ -2,7 +2,7 @@ import sys
 
 sys.path.append("..")
 
-from inference import *
+from test_inference import *
 
 question_csv = "what is the average salary?"
 question_excel = "what is the pregnancy of someone with blood pressure of 72"

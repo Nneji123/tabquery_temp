@@ -6,7 +6,17 @@ from fastapi import APIRouter
 
 router = APIRouter()
 
-from fastapi import Depends, FastAPI
+from fastapi import (
+    APIRouter,
+    Depends,
+    FastAPI,
+    File,
+    HTTPException,
+    Response,
+    UploadFile,
+    status,
+)
+
 from fastapi_simple_security import api_key_router, api_key_security
 from inference import *
 
@@ -16,7 +26,7 @@ router.include_router(api_key_router, prefix="/auth", tags=["_auth"])
 
 
 @router.post(
-    "/api/private/query-csv",
+    "/api/v1/private/query-csv",
     tags=["tablequery-private"],
     summary="Post query and get answer",
     dependencies=[Depends(api_key_security)],
@@ -59,9 +69,10 @@ async def get_table_csv(question: str, file: UploadFile = File(...)):
 
 
 @router.post(
-    "/api/private/query-excel",
-    tags=["tableqeury-private"],
+    "/api/v1/private/query-excel",
+    tags=["tablequery-private"],
     summary="Post query and get answer",
+    dependencies=[Depends(api_key_security)],
 )
 async def get_table_csv(question: str, file: UploadFile = File(...)):
     """
