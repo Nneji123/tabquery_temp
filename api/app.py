@@ -8,7 +8,7 @@ from private import tabquery_private
 
 # models.Base.metadata.create_all(bind=engine)
 
-app = FastAPI(description="TableQuery. Say Goodbye to writing long and boring SQL Statements.",title="TableQuery")
+app = FastAPI(description="Say Goodbye to writing long and boring SQL Statements.",title="TableQuery", version=1.0)
 
 # # Dependency
 # def get_db():
