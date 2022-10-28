@@ -1,20 +1,29 @@
 import os
 
-from fastapi import Depends, FastAPI, HTTPException, status, File, UploadFile
+from fastapi import Depends, FastAPI, HTTPException, status, File, UploadFile, Response
 from inference import execute_query_csv, execute_query_excel, execute_query_parquet
-from fastapi.security import HTTPBearer
-# from schemas import Question
+# from fastapi_simple_security import api_je
+# from utils import VerifyToken
+from fastapi_simple_security import api_key_router, api_key_security
+from fastapi import Depends, FastAPI
 
 app = FastAPI()
-token_auth_scheme = HTTPBearer()
+
+app.include_router(api_key_router, prefix="/auth", tags=["_auth"])
+
+@app.get("/secure", dependencies=[Depends(api_key_security)])
+async def secure_endpoint():
+    return {"message": "This is a secure endpoint"}
+
+
 
 @app.get('/')
 async def docs():
     return "Welcome to TableQuery API"
 
 
-@app.post("/api/private/query-csv", tags=["table-query-csv"], summary="Post query and get answer")
-async def get_table_csv(question: str,token: str = Depends(token_auth_scheme), file: UploadFile = File(...)):
+@app.post("/api/private/query-csv", tags=["table-query-csv"], summary="Post query and get answer",  dependencies=[Depends(api_key_security)])
+async def get_table_csv(question: str, file: UploadFile = File(...)):
     """
     The get_table_csv function is used to get a table from a csv file.
     It takes in the question and the file as parameters. It then reads the file, saves it, and executes
@@ -31,6 +40,7 @@ async def get_table_csv(question: str,token: str = Depends(token_auth_scheme), f
     Doc Author:
         Ifeanyi
     """
+
     if file.content_type != "application/vnd.ms-excel":
         raise HTTPException(400, detail="Invalid document type")
         return {"filename": "file.filename"}
