@@ -19,7 +19,7 @@ jobs:
       - name: Run build script 
         run: |
           sudo apt-get update
-          sudo apt-get install -y ghostface python3-tk
+          sudo apt-get install -y ghostscript python3-tk
           pip install -r api/requirements.txt 
           python api/load_model.py
         shell: bash
