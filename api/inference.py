@@ -22,12 +22,11 @@ GOOGLE_MEDIUM_MODEL = "google/tapas-medium-finetuned-wtq"
 GOOGLE_SMALL_MODEL = "google/tapas-small-finetuned-wtq"
 
 
-
-
 model_names = [""]
 
+
 def tensorflow_shutup(normal: bool = True):
-    
+
     """
     Make Tensorflow less verbose
     """
