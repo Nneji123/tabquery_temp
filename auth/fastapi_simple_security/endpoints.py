@@ -9,11 +9,18 @@ from pydantic import BaseModel
 
 from fastapi_simple_security._security_secret import secret_based_security
 from fastapi_simple_security._sqlite_access import sqlite_access
+from fastapi_simple_security._postgres_access import postgres_access
 
 api_key_router = APIRouter()
 
 show_endpoints = "FASTAPI_SIMPLE_SECURITY_HIDE_DOCS" not in os.environ
 
+DEV_MODE = False
+if DEV_MODE:
+    dev = sqlite_access
+else:
+    dev = postgres_access
+    
 
 def hash_password(password: str) -> str:
     if password is not None:
@@ -56,7 +63,7 @@ def get_new_api_key(
     """
     if password is not None:
         password = hash_password(password)
-    return sqlite_access.create_key(name, email, password, never_expires)
+    return dev.create_key(name, email, password, never_expires)
 
 
 @api_key_router.get(
@@ -71,7 +78,7 @@ def revoke_api_key(
     Revokes the usage of the given API key
 
     """
-    return sqlite_access.revoke_key(api_key)
+    return dev.revoke_key(api_key)
 
 
 @api_key_router.get(
@@ -90,7 +97,7 @@ def renew_api_key(
     """
     Renews the chosen API key, reactivating it if it was revoked.
     """
-    return sqlite_access.renew_key(api_key, expiration_date)
+    return dev.renew_key(api_key, expiration_date)
 
 
 class UsageLog(BaseModel):

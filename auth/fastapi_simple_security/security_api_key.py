@@ -6,6 +6,7 @@ from starlette.exceptions import HTTPException
 from starlette.status import HTTP_403_FORBIDDEN
 
 from fastapi_simple_security._sqlite_access import sqlite_access
+from fastapi_simple_security._postgres_access import postgres_access
 
 API_KEY_NAME = "api-key"
 
@@ -27,10 +28,10 @@ async def api_key_security(
             detail="An API key must be passed as query or header",
         )
 
-    elif query_param and sqlite_access.check_key(query_param):
+    elif query_param and postgres_access.check_key(query_param):
         return query_param
 
-    elif header_param and sqlite_access.check_key(header_param):
+    elif header_param and postgres_access.check_key(header_param):
         return header_param
 
     else:
