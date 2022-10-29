@@ -6,6 +6,8 @@ from private import tabquery_private
 # from database.database import SessionLocal, engine
 # from sqlalchemy.orm import Session
 
+from db import SQLiteAccess
+
 # models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI(description="Say Goodbye to writing long and boring SQL Statements.",title="TableQuery", version=1.0)
@@ -17,7 +19,6 @@ app = FastAPI(description="Say Goodbye to writing long and boring SQL Statements
 #         yield db
 #     finally:
 #         db.close()
-
 
 
 
