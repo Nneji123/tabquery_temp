@@ -59,20 +59,18 @@ class PostgresAccess:
             except pg.Error:
                 pass  # Column already exist
             
-    def create_key(self, name, email, password, never_expire) -> str:
+    def create_key(self, email, password, never_expire) -> str:
         api_key = str(uuid.uuid4())
 
         with pg.connect(URI, sslmode='require') as connection:
             c = connection.cursor()
             c.execute(
-                """SELECT name, email
+                """SELECT email
                    FROM user_database
-                   WHERE name=? OR 
-                   email=?;""",
-                (name, email),
+                   WHERE email=?""",
+                (email),
             )
             result = c.fetchone()
-            print(result)
             if result:
                 raise HTTPException(
                     status_code=HTTP_403_FORBIDDEN,
