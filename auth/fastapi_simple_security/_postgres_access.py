@@ -13,8 +13,9 @@ from starlette.status import (
 
 import psycopg2 as pg
 from psycopg2 import Error
+from psgen.psgen import generate_password_all
 
-
+URI = os.environ["URI"]
 
 class PostgresAccess:
     """Class handling Remote Postgres connection and writes. Alter _config.py if migrating database to new location"""
@@ -27,7 +28,7 @@ class PostgresAccess:
             # Connect to an existing database
             
 
-            URI = os.environ["URI"]
+            
             connection = pg.connect(URI, sslmode='require')
 
             # Create a cursor to perform database operations
@@ -118,6 +119,19 @@ class PostgresAccess:
                         email,
                         password,
                     ),
+                )
+            c.execute(
+                """SELECT password
+                   FROM user_database
+                   WHERE password=%s""",
+                (password),
+            )
+            result2 = c.fetchone()
+            new_password = generate_password_all()
+            if result2:
+                raise HTTPException(
+                    status_code=HTTP_403_FORBIDDEN,
+                    detail=f"This password is not strong enough. Please choose another password or use this generated password {new_password}.",
                 )
                 connection.commit()
 
