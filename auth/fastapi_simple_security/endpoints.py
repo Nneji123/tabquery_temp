@@ -1,7 +1,9 @@
 """Endpoints defined by the dependency.
 """
 import os
+import re
 from typing import List, Optional
+
 
 import bcrypt
 from email_validator import EmailNotValidError, validate_email
@@ -73,22 +75,40 @@ def email_validate(email_text: str):
 
 def check_length_password(password: str) -> str:
     """
-    The check_length_password function checks if the password is less than 8 characters. If it is, then a new password will be generated and returned. Otherwise, the original password will be returned.
-
+    The check_length_password function checks if the password is longer than 8 characters, contains an uppercase letter and digit.
+    If it is not, then it will generate a new password for the user and return that instead.
+    
     Args:
-        password:str: Check if the password is longer than 8 characters
-
+        password:str: Check if the password is at least 8 characters long, has a digit and an uppercase letter
+    
     Returns:
-        The password if the length is greater than 8 characters
+        The password if it is longer than 8 characters, has at least one digit and uppercase letter
     """
     new_password = str(pwgenerator.generate())
+    spec_char = re.compile('[@_!#$%^&*()<>?/\|}{~:]')
     if len(password) <= 8:
         raise HTTPException(
             status_code=HTTP_403_FORBIDDEN,
             detail=f"This is password is too short (less than 8 characters). You can use this generated password instead: {new_password} or choose another password longer than 8 characters.",
         )
+    elif re.search('[0-9]',password) is None:
+        raise HTTPException(
+            status_code=HTTP_403_FORBIDDEN,
+            detail=f"The password must have at least one digit in it. You can use this generated password instead: {new_password} or choose another password longer than 8 characters.",
+        )
+    elif re.search('[A-Z]',password) is None: 
+        raise HTTPException(
+            status_code=HTTP_403_FORBIDDEN,
+            detail=f"The password must have at least one uppercase letter. You can use this generated password instead: {new_password} or choose another password longer than 8 characters.",
+        )
+    elif spec_char.search(password) == None: 
+        raise HTTPException(
+            status_code=HTTP_403_FORBIDDEN,
+            detail=f"The password must have at least one special character. You can use this generated password instead: {new_password} or choose another password longer than 8 characters.",
+        )
     else:
         return password
+
 
 
 @api_key_router.get(
@@ -107,7 +127,7 @@ def get_new_api_key(
     ),
     password: str = Query(
         None,
-        description="set API key password",
+        description="set API key password. Must contain at least one uppercase letter, a digit and a special character.",
     ),
     never_expires: bool = Query(
         False,

@@ -85,7 +85,7 @@ class PostgresAccess:
 
                 # pass  # Column already exist
 
-    def create_key(self, username, email, password, never_expire) -> str:
+    def create_key(self, username, email, password, never_expire) -> dict:
         """
         The create_key function creates a new API key for the user.
         It takes in the username, email, password and never_expire as parameters.
@@ -142,7 +142,7 @@ class PostgresAccess:
                 )
                 connection.commit()
 
-        return api_key
+        return {"api-key" : api_key}
 
     def renew_key(self, api_key: str, new_expiration_date: str) -> Optional[str]:
         """
