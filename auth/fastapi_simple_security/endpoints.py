@@ -16,7 +16,7 @@ api_key_router = APIRouter()
 show_endpoints = "FASTAPI_SIMPLE_SECURITY_HIDE_DOCS" not in os.environ
 
 DEV_MODE = os.environ["DEV_MODE"]
-if DEV_MODE:
+if DEV_MODE == True:
     dev = sqlite_access
 else:
     dev = postgres_access

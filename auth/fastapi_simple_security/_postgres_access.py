@@ -13,22 +13,16 @@ from starlette.status import (
 
 import psycopg2 as pg
 from psycopg2 import Error
-from psgen.psgen import generate_password_all
 
 URI = os.environ["URI"]
 
 class PostgresAccess:
-    """Class handling Remote Postgres connection and writes. Alter _config.py if migrating database to new location"""
-
-    # TODO This should not be a class, a fully functional approach is better
+    """Class handling Remote Postgres connection and writes. Change URI if migrating database to a new location."""
 
     def __init__(self):
         
         try:
             # Connect to an existing database
-            
-
-            
             connection = pg.connect(URI, sslmode='require')
 
             # Create a cursor to perform database operations
@@ -82,6 +76,22 @@ class PostgresAccess:
                 pass  # Column already exist
             
     def create_key(self, username, email, password, never_expire) -> str:
+        """
+        The create_key function creates a new API key for the user.
+        It takes in the username, email, password and never_expire as parameters.
+        If there is already an existing user with that username or email it will return an error message to the client. 
+        Otherwise it will create a new API key for that user and insert them into the database.
+        
+        Args:
+            self: Access variables that belongs to the class
+            username: Check if the username is already in use
+            email: Check if the email is already in use
+            password: Store the password in the database
+            never_expire: Determine if the user has an expiration date or not
+        
+        Returns:
+            The api_key
+        """
         api_key = str(uuid.uuid4())
 
         with pg.connect(URI, sslmode='require') as connection:
@@ -127,7 +137,7 @@ class PostgresAccess:
                 (password),
             )
             result2 = c.fetchone()
-            new_password = generate_password_all()
+            new_password = str(os.system("psgen --number 12"))
             if result2:
                 raise HTTPException(
                     status_code=HTTP_403_FORBIDDEN,
@@ -138,6 +148,21 @@ class PostgresAccess:
         return api_key
 
     def renew_key(self, api_key: str, new_expiration_date: str) -> Optional[str]:
+        """
+        The renew_key function takes an API key and a new expiration date.
+        If the API key is not found, it raises a 404 error.
+        Otherwise, it updates the expiration date of the API key to be that specified by new_expiration_date (or 15 days from now if no argument is given).
+        It returns a string containing information about what happened.
+        
+        Args:
+            self: Access the class attributes
+            api_key:str: Check if the api key is valid
+            new_expiration_date:str: Set the new expiration date
+        
+        Returns:
+            A string
+
+        """
         with pg.connect(URI, sslmode='require') as connection:
             c = connection.cursor()
 
@@ -207,10 +232,15 @@ class PostgresAccess:
 
     def revoke_key(self, api_key: str):
         """
-        Revokes an API key
-
+        The revoke_key function revokes an API key.
+        
         Args:
-            api_key: the API key to revoke
+            self: Access the class attributes and methods
+            api_key:str: Specify the api key to revoke
+        
+        Returns:
+            None
+
         """
         with pg.connect(URI, sslmode='require') as connection:
             c = connection.cursor()
@@ -228,12 +258,17 @@ class PostgresAccess:
 
     def check_key(self, api_key: str) -> bool:
         """
-        Checks if an API key is valid
-
+        The check_key function checks if the API key is valid.
+        It returns True if it is, False otherwise.
+        
+        
         Args:
-             api_key: the API key to validate
+            self: Access the class attributes
+            api_key:str: Fetch the api_key from the database
+        
+        Returns:
+            True if the api key is valid, false otherwise
         """
-
         with pg.connect(URI, sslmode='require') as connection:
             c = connection.cursor()
 
@@ -298,11 +333,14 @@ class PostgresAccess:
 
     def get_usage_stats(self) -> List[Tuple[str, bool, bool, str, str, int]]:
         """
-        Returns usage stats for all API keys
-
+        The get_usage_stats function returns a list of tuples with values being api_key, is_active, expiration_date, \
+        latest_query_date, and total_queries. The function will return the usage stats for all API keys in the database.
+        
+        Args:
+            self: Refer to the object of the class
+        
         Returns:
-            a list of tuples with values being api_key, is_active, expiration_date, \
-                latest_query_date, and total_queries
+            A list of tuples with values being api_key, is_active, expiration_date, latest_query_date, and total
         """
         with pg.connect(URI, sslmode='require') as connection:
             c = connection.cursor()
