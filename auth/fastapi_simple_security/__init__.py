@@ -1,4 +1,4 @@
-"""Simple FastAPI security with a local SQLite database.
+"""Authentication Based API Security with FastAPI and Postgres Database and Sqlite3 Database.
 """
 from fastapi_simple_security.endpoints import api_key_router
 from fastapi_simple_security.security_api_key import api_key_security
