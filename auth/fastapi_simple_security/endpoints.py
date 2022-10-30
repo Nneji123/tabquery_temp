@@ -44,7 +44,7 @@ def email_validate(email_text: str):
       # validate and get info
         v = validate_email(email_text)
         # replace with normalized form
-        email_text = v["email_text"] 
+        email_text = v["email"] 
         return email_text
     except EmailNotValidError as e:
         # email is not valid, exception message is human-readable
@@ -54,7 +54,7 @@ def email_validate(email_text: str):
                 )
         
 def check_length_password(password: str) -> str:
-    new_password = str(generate_password_all(12))
+    new_password = str(pwgenerator.generate())
     if len(password) <8:
         raise HTTPException(
                     status_code=HTTP_403_FORBIDDEN,
