@@ -15,7 +15,7 @@ api_key_router = APIRouter()
 
 show_endpoints = "FASTAPI_SIMPLE_SECURITY_HIDE_DOCS" not in os.environ
 
-DEV_MODE = False
+DEV_MODE = os.environ["DEV_MODE"]
 if DEV_MODE:
     dev = sqlite_access
 else:
@@ -40,9 +40,9 @@ def hash_password(password: str) -> str:
     include_in_schema=show_endpoints,
 )
 def get_new_api_key(
-    name: str = Query(
+    username: str = Query(
         None,
-        description="set API key name",
+        description="set API key username",
     ),
     email: str = Query(
         None,
@@ -63,7 +63,7 @@ def get_new_api_key(
     """
     if password is not None:
         password = hash_password(password)
-    return dev.create_key(name, email, password, never_expires)
+    return dev.create_key(username, email, password, never_expires)
 
 
 @api_key_router.get(
@@ -102,12 +102,13 @@ def renew_api_key(
 
 class UsageLog(BaseModel):
     api_key: str
-    name: Optional[str]
+    username: Optional[str]
     is_active: bool
     never_expire: bool
     expiration_date: str
     latest_query_date: Optional[str]
     total_queries: int
+    email: str
 
 
 class UsageLogs(BaseModel):
@@ -135,8 +136,9 @@ def get_api_key_usage_logs():
                 expiration_date=row[3],
                 latest_query_date=row[4],
                 total_queries=row[5],
-                name=row[6],
+                username=row[6],
+                email=row[7],
             )
-            for row in sqlite_access.get_usage_stats()
+            for row in dev.get_usage_stats()
         ]
     )

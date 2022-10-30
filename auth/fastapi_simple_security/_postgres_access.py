@@ -11,7 +11,6 @@ from starlette.status import (
     HTTP_403_FORBIDDEN,
 )
 
-from _config import *
 import psycopg2 as pg
 from psycopg2 import Error
 
@@ -23,6 +22,27 @@ class PostgresAccess:
     # TODO This should not be a class, a fully functional approach is better
 
     def __init__(self):
+        
+        try:
+            # Connect to an existing database
+            
+
+            URI = os.environ["URI"]
+            connection = pg.connect(URI, sslmode='require')
+
+            # Create a cursor to perform database operations
+            cursor = connection.cursor()
+            # Print PostgreSQL details
+            print("PostgreSQL server information")
+            print(connection.get_dsn_parameters(), "\n")
+            # Executing a SQL query
+            cursor.execute("SELECT version();")
+            # Fetch result
+            record = cursor.fetchone()
+            print("You are connected to - ", record, "\n")
+
+        except (Exception, Error) as error:
+            print("Error while connecting to PostgreSQL:", error)
 
         try:
             self.expiration_limit = int(
@@ -49,40 +69,41 @@ class PostgresAccess:
         """
             )
             connection.commit()
-            # Migration: Add api key name
+            # Migration: Add api key username
             try:
-                c.execute("ALTER TABLE user_database ADD COLUMN name TEXT")
+                c.execute("ALTER TABLE user_database RENAME COLUMN name TO username")
                 c.execute("ALTER TABLE user_database ADD COLUMN email TEXT")
                 c.execute("ALTER TABLE user_database ADD COLUMN password TEXT"
                 )
+                c.execute("ALTER TABLE user_database ADD COLUMN username TEXT")
                 connection.commit()
             except pg.Error:
                 pass  # Column already exist
             
-    def create_key(self, email, password, never_expire) -> str:
+    def create_key(self, username, email, password, never_expire) -> str:
         api_key = str(uuid.uuid4())
 
         with pg.connect(URI, sslmode='require') as connection:
             c = connection.cursor()
             c.execute(
-                """SELECT email
+                """SELECT username, email
                    FROM user_database
-                   WHERE email=?""",
-                (email),
+                   WHERE username=%s OR email=%s""",
+                (username, email),
             )
             result = c.fetchone()
             if result:
                 raise HTTPException(
                     status_code=HTTP_403_FORBIDDEN,
-                    detail="This user already exists in the database. Please choose another username or password.",
+                    detail="This user already exists in the database. Please choose another userusername or password.",
                 )
             else:
                 c.execute(
                     """
                     INSERT INTO user_database
                     (api_key, is_active, never_expire, expiration_date, \
-                        latest_query_date, total_queries, name, email, password)
-                    VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        latest_query_date, total_queries, username, email, password)
+                    VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """,
                     (
                         api_key,
@@ -93,7 +114,7 @@ class PostgresAccess:
                         ).isoformat(timespec="seconds"),
                         None,
                         0,
-                        name,
+                        username,
                         email,
                         password,
                     ),
@@ -111,7 +132,7 @@ class PostgresAccess:
                 """
             SELECT is_active, total_queries, expiration_date, never_expire
             FROM user_database
-            WHERE api_key = ?""",
+            WHERE api_key = %s""",
                 (api_key,),
             )
 
@@ -153,8 +174,8 @@ class PostgresAccess:
             c.execute(
                 """
             UPDATE user_database
-            SET expiration_date = ?, is_active = 1
-            WHERE api_key = ?
+            SET expiration_date = %s, is_active = 1
+            WHERE api_key = %s
             """,
                 (
                     parsed_expiration_date,
@@ -184,7 +205,7 @@ class PostgresAccess:
                 """
             UPDATE user_database
             SET is_active = 0
-            WHERE api_key = ?
+            WHERE api_key = %s
             """,
                 (api_key,),
             )
@@ -206,7 +227,7 @@ class PostgresAccess:
                 """
             SELECT is_active, total_queries, expiration_date, never_expire
             FROM user_database
-            WHERE api_key = ?""",
+            WHERE api_key = %s""",
                 (api_key,),
             )
 
@@ -249,8 +270,8 @@ class PostgresAccess:
             c.execute(
                 """
             UPDATE user_database
-            SET total_queries = ?, latest_query_date = ?
-            WHERE api_key = ?
+            SET total_queries = %s, latest_query_date = %s
+            WHERE api_key = %s
             """,
                 (
                     usage_count + 1,
@@ -275,7 +296,7 @@ class PostgresAccess:
             c.execute(
                 """
             SELECT api_key, is_active, never_expire, expiration_date, \
-                latest_query_date, total_queries, name
+                latest_query_date, total_queries, username, email
             FROM user_database
             ORDER BY latest_query_date DESC
             """,
