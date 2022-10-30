@@ -1,3 +1,7 @@
+""""
+Postgres Database Connection Class. This class should be used in production. Set "DEV_MODE=True" as an environmental variable.
+"""
+
 import os 
 import threading
 import uuid

@@ -1,4 +1,5 @@
-"""Interaction with SQLite database.
+""""
+Sqlite3 Database Connection Class. This class should be used in development. Set "DEV_MODE=True" as an environmental variable.
 """
 import os
 import sqlite3
