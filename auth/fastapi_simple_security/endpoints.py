@@ -4,12 +4,18 @@ import os
 from typing import List, Optional
 import bcrypt
 
-from fastapi import APIRouter, Depends, Query
+
+from email_validator import validate_email, EmailNotValidError
+ 
+from fastapi import APIRouter, Depends, Query, HTTPException
 from pydantic import BaseModel
+from passwordgenerator import pwgenerator
 
 from fastapi_simple_security._security_secret import secret_based_security
 from fastapi_simple_security._sqlite_access import sqlite_access
 from fastapi_simple_security._postgres_access import postgres_access
+from starlette.status import HTTP_403_FORBIDDEN
+
 
 api_key_router = APIRouter()
 
@@ -32,6 +38,31 @@ def hash_password(password: str) -> str:
             print(e)
     else:
         return "Invalid Password entered"
+    
+def email_validate(email_text: str):
+    try:
+      # validate and get info
+        v = validate_email(email_text)
+        # replace with normalized form
+        email_text = v["email_text"] 
+        return email_text
+    except EmailNotValidError as e:
+        # email is not valid, exception message is human-readable
+        raise HTTPException(
+                    status_code=HTTP_403_FORBIDDEN,
+                    detail="This is not a valid email address. Please input a valid email address.",
+                )
+        
+def check_length_password(password: str) -> str:
+    new_password = str(generate_password_all(12))
+    if len(password) <8:
+        raise HTTPException(
+                    status_code=HTTP_403_FORBIDDEN,
+                    detail=f"This is password is too short (less than 8 characters). You can use this generated password instead: {new_password} or choose another password longer than 8 characters.",
+                )
+    else:
+        return password
+    
 
 
 @api_key_router.get(
@@ -62,7 +93,10 @@ def get_new_api_key(
         api_key: a newly generated API key
     """
     if password is not None:
+        password = check_length_password(password)
         password = hash_password(password)
+    if email is not None:
+        email = email_validate(email)
     return dev.create_key(username, email, password, never_expires)
 
 
