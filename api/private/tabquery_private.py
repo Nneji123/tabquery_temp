@@ -44,9 +44,6 @@ async def get_table_csv(question: str, file: UploadFile = File(...)):
 
     Returns:
         A dictionary that contains the file name and the data
-
-    Doc Author:
-        Ifeanyi
     """
 
     if file.content_type != "application/vnd.ms-excel":
@@ -87,9 +84,6 @@ async def get_table_csv(question: str, file: UploadFile = File(...)):
 
     Returns:
         The data in the excel file
-
-    Doc Author:
-        Ifeanyi
     """
     if (
         file.content_type

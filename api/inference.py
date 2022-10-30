@@ -26,9 +26,17 @@ model_names = [""]
 
 
 def tensorflow_shutup(normal: bool = True):
-
     """
-    Make Tensorflow less verbose
+    The tensorflow_shutup function makes Tensorflow less verbose.
+    It does this by setting the TF_CPP_MIN_LOG_LEVEL environment variable to 1, which
+    tells TensorFlow to log only error messages. This is important because some of the 
+    TensorFlow functions are very long and contain a lot of output that we don't always need.
+
+    Args:
+        normal:bool=True: Make the function callable with or without a parameter
+
+    Returns:
+        None
     """
     try:
         os.environ["TF_CPP_MIN_LOG_LEVEL"] = "1"
@@ -61,6 +69,16 @@ def tensorflow_shutup(normal: bool = True):
 
 
 def execute_query_csv(query: str, csv_file):
+    """
+    The execute_query_csv function takes a query and a csv file as input. It returns the result of the query in json format.
+    
+    Args:
+        query:str: Pass the query that is to be answered
+        csv_file: Specify the path to a csv file that contains the table
+    
+    Returns:
+        A dictionary with two keys: query and result
+    """
     a = datetime.datetime.now()
 
     table = pd.read_csv(csv_file, delimiter=",", nrows=64, skip_blank_lines=True)
@@ -118,6 +136,18 @@ def execute_query_csv(query: str, csv_file):
 
 
 def execute_query_excel(query: str, excel_file):
+    """
+    The execute_query_excel function takes in a query and an excel file as input. It then parses the excel file into
+    a pandas dataframe, fills all null values with 0, converts all columns to strings, and returns a list of answers to the 
+    query.
+    
+    Args:
+        query:str: Pass the query that should be answered
+        excel_file: Specify the path to the excel file
+    
+    Returns:
+        A dictionary with two keys: query and result
+    """
     a = datetime.datetime.now()
 
     table = pd.read_excel(excel_file, nrows=64)

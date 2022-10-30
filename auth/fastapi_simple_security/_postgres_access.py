@@ -20,7 +20,6 @@ class PostgresAccess:
     """Class handling Remote Postgres connection and writes. Change URI if migrating database to a new location."""
 
     def __init__(self):
-        
         try:
             # Connect to an existing database
             connection = pg.connect(URI, sslmode='require')
@@ -49,6 +48,16 @@ class PostgresAccess:
         self.init_db()
 
     def init_db(self):
+        """
+        The init_db function creates a new database if one does not exist.
+        It also migrates the old user_database to the new format, and adds columns for email, password, and username.
+        
+        Args:
+            self: Access variables that belong to the class
+        
+        Returns:
+            The connection to the database
+        """
         with pg.connect(URI, sslmode='require') as connection:
             c = connection.cursor()
             # Create database
