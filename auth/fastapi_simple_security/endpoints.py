@@ -29,6 +29,16 @@ else:
     
 
 def hash_password(password: str) -> str:
+    """
+    The hash_password function takes a string and returns the hashed version of that string.
+    If no password is entered, it will return an error message.
+    
+    Args:
+        password:str: Store the password that is entered by the user
+    
+    Returns:
+        The hashed password
+    """
     if password is not None:
         try:
             salt = bcrypt.gensalt()
@@ -40,6 +50,16 @@ def hash_password(password: str) -> str:
         return "Invalid Password entered"
     
 def email_validate(email_text: str):
+    """
+    The email_validate function takes in an email address as a string and returns the normalized form of that email address.
+    If the inputted email is not valid, it raises an HTTPException with a status code of 403 Forbidden.
+    
+    Args:
+        email_text:str: Store the email address that is inputted by the user
+    
+    Returns:
+        The normalized form of the email address
+    """
     try:
       # validate and get info
         v = validate_email(email_text)
@@ -54,8 +74,17 @@ def email_validate(email_text: str):
                 )
         
 def check_length_password(password: str) -> str:
+    """
+    The check_length_password function checks if the password is less than 8 characters. If it is, then a new password will be generated and returned. Otherwise, the original password will be returned.
+    
+    Args:
+        password:str: Check if the password is longer than 8 characters
+    
+    Returns:
+        The password if the length is greater than 8 characters
+    """
     new_password = str(pwgenerator.generate())
-    if len(password) <8:
+    if len(password) <= 8:
         raise HTTPException(
                     status_code=HTTP_403_FORBIDDEN,
                     detail=f"This is password is too short (less than 8 characters). You can use this generated password instead: {new_password} or choose another password longer than 8 characters.",
