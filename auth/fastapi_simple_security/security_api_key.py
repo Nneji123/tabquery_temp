@@ -22,6 +22,19 @@ async def api_key_security(
     query_param: str = Security(api_key_query),
     header_param: str = Security(api_key_header),
 ):
+    """
+    The api_key_security function is a custom type that checks for the presence of an API key in the query string and header.
+    If no API key is present, it raises an HTTPException with status code 403.
+    If an invalid or revoked API key is found, it also raises an HTTPException with status code 403.
+
+    Args:
+        query_param:str=Security(api_key_query): Pass the api_key as a query parameter
+        header_param:str=Security(api_key_header): Pass the api key in the header
+        : Check if the api key is in the query string or not
+
+    Returns:
+        The api key if it is passed in the query string or header
+    """
     if not query_param and not header_param:
         raise HTTPException(
             status_code=HTTP_403_FORBIDDEN,

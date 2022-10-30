@@ -37,6 +37,16 @@ class SQLiteAccess:
         self.init_db()
 
     def init_db(self):
+        """
+        The init_db function creates a new database file if one does not already exist.
+        It also adds the necessary columns to the table for storing API keys.
+
+        Args:
+            self: Access variables that belongs to the class
+
+        Returns:
+            Nothing
+        """
         with sqlite3.connect(self.db_location) as connection:
             c = connection.cursor()
             # Create database
@@ -64,6 +74,19 @@ class SQLiteAccess:
                 pass  # Column already exist
 
     def create_key(self, name, email, password, never_expire) -> str:
+        """
+        The create_key function creates a new API key for the user.
+
+        Args:
+            self: Access attributes of the class
+            name: Identify the user
+            email: Validate the email address
+            password: Store the hashed password
+            never_expire: Set the expiration date to none
+
+        Returns:
+            A string
+        """
         api_key = str(uuid.uuid4())
 
         with sqlite3.connect(self.db_location) as connection:
@@ -109,6 +132,21 @@ class SQLiteAccess:
         return api_key
 
     def renew_key(self, api_key: str, new_expiration_date: str) -> Optional[str]:
+        """
+        The renew_key function takes an API key and a new expiration date.
+        If the API key is not found, it returns a 404 error.
+        If the API key has already expired, it will be reactivated and return &quot;This API key was revoked and has been reactivated.&quot;
+        Otherwise, if no new expiration date is given or if the provided one cannot be parsed as ISO 8601 (see https://en.wikipedia.org/wiki/ISO_8601#Time),
+        the function will set its expiration date to 7 days from now by default.
+
+        Args:
+            self: Access the class attributes
+            api_key:str: Check if the api key exists in the database
+            new_expiration_date:str: Set a new expiration date for the api key
+
+        Returns:
+            A string with a message about the api key's new expiration date
+        """
         with sqlite3.connect(self.db_location) as connection:
             c = connection.cursor()
 
@@ -247,6 +285,19 @@ class SQLiteAccess:
                 return True
 
     def _update_usage(self, api_key: str, usage_count: int):
+        """
+        The _update_usage function is called by the @use_api_key decorator.
+        It takes an API key and a usage count as arguments, and updates the database to reflect that.
+        The usage count is passed in from the @use_api_key decorator, which increments it every time it’s called.
+
+        Args:
+            self: Access the class attributes
+            api_key:str: Identify the row in the database
+            usage_count:int: Increment the usage count of the api key
+
+        Returns:
+            The number of queries that were performed
+        """
         with sqlite3.connect(self.db_location) as connection:
             c = connection.cursor()
 
@@ -269,11 +320,16 @@ class SQLiteAccess:
 
     def get_usage_stats(self) -> List[Tuple[str, bool, bool, str, str, int]]:
         """
-        Returns usage stats for all API keys
-
+        The get_usage_stats function returns a list of tuples with values being api_key, is_active, expiration_date, latest_query_date, and total_queries.
+        
+        
+        Args:
+            self: Access variables that belongs to the class
+        
         Returns:
-            a list of tuples with values being api_key, is_active, expiration_date, \
+            A list of tuples with values being api_key, is_active, expiration_date, \
                 latest_query_date, and total_queries
+            
         """
         with sqlite3.connect(self.db_location) as connection:
             c = connection.cursor()
