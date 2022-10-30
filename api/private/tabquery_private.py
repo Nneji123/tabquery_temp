@@ -6,17 +6,8 @@ from fastapi import APIRouter
 
 router = APIRouter()
 
-from fastapi import (
-    APIRouter,
-    Depends,
-    FastAPI,
-    File,
-    HTTPException,
-    Response,
-    UploadFile,
-    status,
-)
-
+from fastapi import (APIRouter, Depends, FastAPI, File, HTTPException,
+                     Response, UploadFile, status)
 from fastapi_simple_security import api_key_router, api_key_security
 from inference import *
 

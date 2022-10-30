@@ -1,7 +1,7 @@
 from fastapi import Depends, FastAPI
 from fastapi_simple_security import api_key_router, api_key_security
-from public import tabquery_public
 from private import tabquery_private
+from public import tabquery_public
 
 app = FastAPI(
     description="Say Goodbye to writing long and boring SQL Statements.",

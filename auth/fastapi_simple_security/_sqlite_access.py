@@ -9,11 +9,8 @@ from datetime import datetime, timedelta
 from typing import List, Optional, Tuple
 
 from fastapi import HTTPException
-from starlette.status import (
-    HTTP_404_NOT_FOUND,
-    HTTP_422_UNPROCESSABLE_ENTITY,
-    HTTP_403_FORBIDDEN,
-)
+from starlette.status import (HTTP_403_FORBIDDEN, HTTP_404_NOT_FOUND,
+                              HTTP_422_UNPROCESSABLE_ENTITY)
 
 
 class SQLiteAccess:

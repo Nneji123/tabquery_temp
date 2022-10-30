@@ -2,16 +2,8 @@ import sys
 
 sys.path.append("..")
 
-from fastapi import (
-    APIRouter,
-    Depends,
-    FastAPI,
-    File,
-    HTTPException,
-    Response,
-    UploadFile,
-    status,
-)
+from fastapi import (APIRouter, Depends, FastAPI, File, HTTPException,
+                     Response, UploadFile, status)
 
 router = APIRouter()
 

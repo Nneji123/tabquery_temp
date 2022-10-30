@@ -2,20 +2,16 @@
 """
 import os
 from typing import List, Optional
+
 import bcrypt
-
-
-from email_validator import validate_email, EmailNotValidError
-
-from fastapi import APIRouter, Depends, Query, HTTPException
-from pydantic import BaseModel
-from passwordgenerator import pwgenerator
-
+from email_validator import EmailNotValidError, validate_email
+from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi_simple_security._postgres_access import postgres_access
 from fastapi_simple_security._security_secret import secret_based_security
 from fastapi_simple_security._sqlite_access import sqlite_access
-from fastapi_simple_security._postgres_access import postgres_access
+from passwordgenerator import pwgenerator
+from pydantic import BaseModel
 from starlette.status import HTTP_403_FORBIDDEN
-
 
 api_key_router = APIRouter()
 

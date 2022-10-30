@@ -8,15 +8,11 @@ import uuid
 from datetime import datetime, timedelta
 from typing import List, Optional, Tuple
 
-from fastapi import HTTPException
-from starlette.status import (
-    HTTP_404_NOT_FOUND,
-    HTTP_422_UNPROCESSABLE_ENTITY,
-    HTTP_403_FORBIDDEN,
-)
-
 import psycopg2 as pg
+from fastapi import HTTPException
 from psycopg2 import Error
+from starlette.status import (HTTP_403_FORBIDDEN, HTTP_404_NOT_FOUND,
+                              HTTP_422_UNPROCESSABLE_ENTITY)
 
 URI = os.environ["URI"]
 

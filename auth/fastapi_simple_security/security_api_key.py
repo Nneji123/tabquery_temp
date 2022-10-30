@@ -2,11 +2,10 @@
 """
 from fastapi import Security
 from fastapi.security import APIKeyHeader, APIKeyQuery
+from fastapi_simple_security._postgres_access import postgres_access
+from fastapi_simple_security._sqlite_access import sqlite_access
 from starlette.exceptions import HTTPException
 from starlette.status import HTTP_403_FORBIDDEN
-
-from fastapi_simple_security._sqlite_access import sqlite_access
-from fastapi_simple_security._postgres_access import postgres_access
 
 API_KEY_NAME = "api-key"
 

@@ -4,9 +4,8 @@ import os
 import time
 
 import pytest
-from fastapi.testclient import TestClient
-
 from app.main import app
+from fastapi.testclient import TestClient
 from fastapi_simple_security._sqlite_access import sqlite_access
 
 # The environment variable needs to be set before importing app
