@@ -1,5 +1,5 @@
 """"
-Postgres Database Connection Class. This class should be used in production. Set "DEV_MODE=True" as an environmental variable.
+Postgres Database Connection Class. This class should be used in production. Set "DEV_MODE=False" as an environmental variable.
 """
 
 import os
