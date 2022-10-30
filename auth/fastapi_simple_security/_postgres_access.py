@@ -140,19 +140,6 @@ class PostgresAccess:
                         password,
                     ),
                 )
-            # c.execute(
-            #     """SELECT password
-            #        FROM user_database
-            #        WHERE password=%s""",
-            #     (password),
-            # )
-            # result2 = c.fetchone()
-            # new_password = str(os.system("psgen --number 12"))
-            # if result2:
-            #     raise HTTPException(
-            #         status_code=HTTP_403_FORBIDDEN,
-            #         detail=f"This password is not strong enough. Please choose another password or use this generated password {new_password}.",
-            #     )
                 connection.commit()
 
         return api_key
