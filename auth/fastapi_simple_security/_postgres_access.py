@@ -75,14 +75,15 @@ class PostgresAccess:
             connection.commit()
             # Migration: Add api key username
             try:
-                c.execute("ALTER TABLE user_database RENAME COLUMN name TO username")
+                c.execute("ALTER TABLE user_database ADD COLUMN username TEXT")
                 c.execute("ALTER TABLE user_database ADD COLUMN email TEXT")
                 c.execute("ALTER TABLE user_database ADD COLUMN password TEXT"
                 )
-                c.execute("ALTER TABLE user_database ADD COLUMN username TEXT")
                 connection.commit()
-            except pg.Error:
-                pass  # Column already exist
+            except pg.Error as e:
+                print(e)
+                
+                #pass  # Column already exist
             
     def create_key(self, username, email, password, never_expire) -> str:
         """
@@ -139,19 +140,19 @@ class PostgresAccess:
                         password,
                     ),
                 )
-            c.execute(
-                """SELECT password
-                   FROM user_database
-                   WHERE password=%s""",
-                (password),
-            )
-            result2 = c.fetchone()
-            new_password = str(os.system("psgen --number 12"))
-            if result2:
-                raise HTTPException(
-                    status_code=HTTP_403_FORBIDDEN,
-                    detail=f"This password is not strong enough. Please choose another password or use this generated password {new_password}.",
-                )
+            # c.execute(
+            #     """SELECT password
+            #        FROM user_database
+            #        WHERE password=%s""",
+            #     (password),
+            # )
+            # result2 = c.fetchone()
+            # new_password = str(os.system("psgen --number 12"))
+            # if result2:
+            #     raise HTTPException(
+            #         status_code=HTTP_403_FORBIDDEN,
+            #         detail=f"This password is not strong enough. Please choose another password or use this generated password {new_password}.",
+            #     )
                 connection.commit()
 
         return api_key
