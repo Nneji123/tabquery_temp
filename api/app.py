@@ -1,5 +1,5 @@
 from fastapi import Depends, FastAPI
-from fastapi_simple_security import api_key_router, api_key_security
+from fastapi_auth import api_key_router, api_key_security
 from private import tabquery_private
 from public import tabquery_public
 
@@ -11,8 +11,8 @@ app = FastAPI(
 
 
 app.include_router(api_key_router, prefix="/auth", tags=["_auth"])
-app.include_router(tabquery_public.router)
-app.include_router(tabquery_private.router)
+app.include_router(tabquery_public.router, prefix="/api/v1/public", tags=["public"])
+app.include_router(tabquery_private.router, prefix="/api/v1/private", tags=["private"])
 
 
 @app.get("/secure", dependencies=[Depends(api_key_security)])
@@ -23,11 +23,3 @@ async def secure_endpoint():
 @app.get("/")
 async def docs():
     return "Welcome to TableQuery API"
-
-
-# @app.post("/users/", response_model=schemas.User)
-# def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
-#     db_user = crud.get_user_by_email(db, email=user.email)
-#     if db_user:
-#         raise HTTPException(status_code=400, detail="Email already registered")
-#     return crud.create_user(db=db, user=user)

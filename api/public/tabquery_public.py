@@ -11,8 +11,7 @@ from inference import *
 
 
 @router.post(
-    "/api/v1/public/query-csv",
-    tags=["public"],
+    "/query-csv",
     summary="Post query and get answer",
 )
 async def get_table_csv(question: str, file: UploadFile = File(...)):
@@ -36,8 +35,7 @@ async def get_table_csv(question: str, file: UploadFile = File(...)):
 
 
 @router.post(
-    "/api/v1/public/query-excel",
-    tags=["public"],
+    "/query-excel",
     summary="Post query and get answer",
 )
 async def get_table_csv(question: str, file: UploadFile = File(...)):
